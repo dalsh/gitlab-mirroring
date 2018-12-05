@@ -1,0 +1,9 @@
+stages:
+  - deploy
+
+deploy_prod:
+  stage: deploy
+  image: dtzar/helm-kubectl
+  script:
+    - echo $KUBE_CONFIG | base64 -d > ~/.kube/config
+    - helm list
