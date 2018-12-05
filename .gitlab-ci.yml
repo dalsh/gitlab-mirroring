@@ -1,10 +1,33 @@
 stages:
   - deploy
 
-deploy_prod:
+.helm_deploy: &helm_deploy
   stage: deploy
   image: dtzar/helm-kubectl
   script:
     - mkdir -p ~/.kube/
     - echo $KUBE_CONFIG | base64 -d > ~/.kube/config
-    - helm list
+    - helm init --upgrade
+    - helm upgrade --install --namespace $DEPLOY_NAMESPACE $DEPLOY_RELEASE $DEPLOY_CHART_PATH -f $DEPLOY_VALUES_PATH --set image.tag=$DEPLOY_IMAGE_TAG
+
+deploy_prod:
+  only:
+    - master
+  variables:
+    DEPLOY_NAMESPACE: gitlab-mirroring-prod
+    DEPLOY_RELEASE: gitlab-mirroring-prod
+    DEPLOY_CHART_PATH: ./chart
+    DEPLOY_VALUES_PATH: ./chart/values-prod.yaml
+    DEPLOY_IMAGE_TAG: stable
+  <<: *helm_deploy
+
+deploy_preprod:
+  only:
+    - /[0-9]+\.[0-9]+\.[0-9]+/
+  variables:
+    DEPLOY_NAMESPACE: gitlab-mirroring-preprod
+    DEPLOY_RELEASE: gitlab-mirroring-preprod
+    DEPLOY_CHART_PATH: ./chart
+    DEPLOY_VALUES_PATH: ./chart/values-preprod.yaml
+    DEPLOY_IMAGE_TAG: $CI_COMMIT_TAG
+  <<: *helm_deploy
