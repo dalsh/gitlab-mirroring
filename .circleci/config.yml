@@ -10,4 +10,4 @@ jobs:
       - run: ls ~/.ssh/
       - run: cd $HOME && git clone --mirror $CIRCLE_REPOSITORY_URL ${CIRCLE_PROJECT_REPONAME}_mirror
       - run: cd $HOME/${CIRCLE_PROJECT_REPONAME}_mirror && git remote add mirror-remote ssh://git@git.ioweb.fr:322/misc/github-mirror.git
-      - run: cd $HOME/${CIRCLE_PROJECT_REPONAME}_mirror && git push --mirror --tags -f mirror-remote && git remote prune mirror-remote
+      - run: cd $HOME/${CIRCLE_PROJECT_REPONAME}_mirror && git push --mirror mirror-remote && git remote prune mirror-remote
